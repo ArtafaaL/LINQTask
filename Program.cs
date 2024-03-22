@@ -41,6 +41,26 @@ namespace LINQTask
 
             foreach (var emp in result)
                 Console.WriteLine($"{emp.Name} - {emp.Item2}");
+
+            
+            Console.WriteLine("Новое");
+
+            var sqlLike = from b in buyers
+                          join s in shoppings on b.Id equals s.BuyersId
+                          select new
+                          {
+                              Name = b.Name,
+                              Summa = s.Summa,
+                          } into temp
+                          group temp by temp.Name into g
+                          select new
+                          {
+                              Name = g.Key,
+                              Summa = g.Sum(s => s.Summa)
+                          } into temp
+                          orderby temp.Summa descending
+                          select new { Name = temp.Name, Summa = temp.Summa };
+
         }
     }
 }
