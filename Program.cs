@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BuyerTable;
@@ -29,7 +29,8 @@ namespace LINQTask
                 new Shopping(5, 800M, 3),
                 new Shopping(6, 40.50M, 3),
                 new Shopping(7, 100M, 6),
-                new Shopping(8, 10.10M, 3)
+                new Shopping(8, 10.10M, 3),
+                new Shopping(9, 995.1M, 1)
             };
 
             var result = buyers.GroupJoin(shoppings,
@@ -61,6 +62,44 @@ namespace LINQTask
                           orderby temp.Summa descending
                           select new { Name = temp.Name, Summa = temp.Summa };
 
+            foreach (var emp in sqlLike.Take(1))
+                Console.WriteLine($"{emp.Name} - {emp.Summa}");
+
+            Console.WriteLine("Получение всех лучих покупателей:");
+
+            var groupedDataSet = from s in shoppings
+                           group s by s.BuyersId into g
+                           select new
+                           {
+                               BuyersId = g.Key,
+                               Summa = g.Sum(summa => summa.Summa)
+                           };
+
+            var maxValue = groupedDataSet.Max(summa => summa.Summa);
+
+            var sqlLike2 = from b in buyers
+                          join s in (
+                          from ss in shoppings
+                          group ss by ss.BuyersId into g
+                          select new
+                          {
+                              BuyersId = g.Key,
+                              Summa = g.Sum(summa => summa.Summa)
+                          }
+                          ) on b.Id equals s.BuyersId into temp
+                          from t in temp
+                          where t.Summa == temp.Max(summa => summa.Summa)
+                          select new
+                          {
+                              Name = b.Name,
+                              Summa = t.Summa,
+                          } into temp
+                          where temp.Summa == maxValue
+                          select temp;                  
+
+
+            foreach (var emp in sqlLike2)
+                Console.WriteLine($"{emp.Name} - {emp.Summa}");
         }
     }
 }
