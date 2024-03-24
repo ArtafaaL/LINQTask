@@ -80,7 +80,6 @@ namespace LINQTask
             var sqlLike2 = from b in buyers
                           join s in groupedDataSet on b.Id equals s.BuyersId into temp
                           from t in temp
-                          where t.Summa == temp.Max(summa => summa.Summa)
                           select new
                           {
                               Name = b.Name,
