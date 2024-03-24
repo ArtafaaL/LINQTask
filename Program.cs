@@ -78,15 +78,7 @@ namespace LINQTask
             var maxValue = groupedDataSet.Max(summa => summa.Summa);
 
             var sqlLike2 = from b in buyers
-                          join s in (
-                          from ss in shoppings
-                          group ss by ss.BuyersId into g
-                          select new
-                          {
-                              BuyersId = g.Key,
-                              Summa = g.Sum(summa => summa.Summa)
-                          }
-                          ) on b.Id equals s.BuyersId into temp
+                          join s in groupedDataSet on b.Id equals s.BuyersId into temp
                           from t in temp
                           where t.Summa == temp.Max(summa => summa.Summa)
                           select new
